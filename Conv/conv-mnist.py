@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as data
-import matplotlib.pyplot as plt
 import time
 import visdom
 import numpy as np
@@ -12,14 +11,18 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 
-train_dataset = datasets.MNIST('./data_mnist/', train=True, transform=transforms.ToTensor())
-test_dataset = datasets.MNIST('./data_mnist/', train=False, transform=transforms.ToTensor())
+train_dataset = datasets.MNIST('../data_mnist/', train=True,
+                               transform=transforms.ToTensor())
+test_dataset = datasets.MNIST('../data_mnist/', train=False,
+                              transform=transforms.ToTensor())
 train_size = len(train_dataset)
 test_size = len(test_dataset)
 
 batch_size = 16
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+train_loader = data.DataLoader(train_dataset, batch_size=batch_size,
+                               shuffle=True, num_workers=4)
+test_loader = data.DataLoader(test_dataset, batch_size=batch_size,
+                              shuffle=True, num_workers=4)
 
 
 class convNet(nn.Module):
@@ -41,7 +44,7 @@ class convNet(nn.Module):
         )
         self.fc1 = nn.Linear(4*4*12, 50)
         self.fc2 = nn.Linear(50, 10)
-        
+
     def forward(self, data):    # (?, 28, 28, 1)
         x = self.conv1(data)    # (?, 24, 24, 6) > (?, 12, 12, 6)
         x = self.conv2(x)       # (?, 8, 8, 12) > (?, 4, 4, 12)
@@ -50,6 +53,7 @@ class convNet(nn.Module):
         x = F.leaky_relu(x)     # (?, 50)
         x = self.fc2(x)         # (?, 10)
         return x
+
 
 vis = visdom.Visdom()
 
@@ -106,7 +110,8 @@ for epoch in range(0, epochs):
             xlabel='epoch',
             ylabel='cost'
         ))
-        test_accuracy = vis.line(X=np.array([epoch+1]), Y=np.array([accuracy]), opts=dict(
+        test_accuracy = vis.line(X=np.array([epoch+1]), Y=np.array([accuracy]),
+                                 opts=dict(
             title='Test Accuracy',
             xlabel='epoch',
             ylabel='Accuracy'
@@ -116,3 +121,6 @@ for epoch in range(0, epochs):
         vis.updateTrace(X=np.array([epoch+1]), Y=np.array([accuracy]), win=test_accuracy)
 
 torch.save(cnn.state_dict(), 'cnn.pkl')
+
+if __name__ == '__main__':
+    pass
