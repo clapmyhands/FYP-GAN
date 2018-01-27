@@ -12,9 +12,11 @@ from torch.autograd import Variable
 
 
 train_dataset = datasets.MNIST('../data_mnist/', train=True,
-                               transform=transforms.ToTensor())
+                               transform=transforms.ToTensor(),
+                               download=True)
 test_dataset = datasets.MNIST('../data_mnist/', train=False,
-                              transform=transforms.ToTensor())
+                              transform=transforms.ToTensor(),
+                              download=True)
 train_size = len(train_dataset)
 test_size = len(test_dataset)
 
@@ -30,21 +32,17 @@ class convNet(nn.Module):
         super(convNet, self).__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 6, kernel_size=5),
-            nn.BatchNorm2d(6),
-            nn.Dropout2d(),
             nn.MaxPool2d(2),
             nn.LeakyReLU()
         )
         self.conv2 = nn.Sequential(
             nn.Conv2d(6, 12, kernel_size=5),
-            nn.BatchNorm2d(12),
-            nn.Dropout2d(),
             nn.MaxPool2d(2),
             nn.LeakyReLU()
         )
         self.fc1 = nn.Linear(4*4*12, 50)
         self.fc2 = nn.Linear(50, 10)
-
+ 
     def forward(self, data):    # (?, 28, 28, 1)
         x = self.conv1(data)    # (?, 24, 24, 6) > (?, 12, 12, 6)
         x = self.conv2(x)       # (?, 8, 8, 12) > (?, 4, 4, 12)
@@ -62,8 +60,6 @@ epochs = 400
 learning_rate = 1e-3
 
 cnn = convNet()
-if torch.cuda.is_available:
-    cnn = cnn.cuda()
 optimizer = torch.optim.Adam(cnn.parameters(), lr=learning_rate, weight_decay=1e-5)
 criterion = nn.CrossEntropyLoss()
 
@@ -110,8 +106,7 @@ for epoch in range(0, epochs):
             xlabel='epoch',
             ylabel='cost'
         ))
-        test_accuracy = vis.line(X=np.array([epoch+1]), Y=np.array([accuracy]),
-                                 opts=dict(
+        test_accuracy = vis.line(X=np.array([epoch+1]), Y=np.array([accuracy]), opts=dict(
             title='Test Accuracy',
             xlabel='epoch',
             ylabel='Accuracy'
