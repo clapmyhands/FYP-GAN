@@ -1,5 +1,5 @@
 import time
-from torch.nn.init import xavier_uniform, constant
+from torch.nn.init import xavier_uniform, constant, xavier_normal
 
 
 def initializeWeight(module):
@@ -12,10 +12,10 @@ def initializeWeight(module):
     """
     classname = module.__class__.__name__
     if(classname.find('Conv') != -1):
-        xavier_uniform(module.weight)
+        xavier_normal(module.weight)
         constant(module.bias, 0)
     elif(classname.find('Linear') != -1):
-        xavier_uniform(module.weight)
+        xavier_normal(module.weight)
         constant(module.bias, 0)
 
 ## TODO: wrapper for logging time
