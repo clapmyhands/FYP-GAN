@@ -15,7 +15,7 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..",".."))
-from util.helper import initializeWeight
+from util.helper import initializeXavierNormalWeight
 from definitions import DATA_DIR
 
 def normalizeForImage(tensor: torch.FloatTensor):
@@ -89,7 +89,7 @@ epochs = 100
 learning_rate = 1e-3
 
 net = convNet()
-net.apply(initializeWeight)
+net.apply(initializeXavierNormalWeight)
 optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate, weight_decay=1e-5)
 criterion = nn.CrossEntropyLoss()
 

@@ -1,8 +1,9 @@
 import time
+import math
 from torch.nn.init import xavier_uniform, constant, xavier_normal
 
 
-def initializeWeight(module):
+def initializeXavierNormalWeight(module):
     """
     Initialize weight with Xavier uniform distribution to avoid vanishing gradient problem
     should be enough with this without batch norm since our network is not very deep
@@ -17,6 +18,23 @@ def initializeWeight(module):
     elif(classname.find('Linear') != -1):
         xavier_normal(module.weight)
         constant(module.bias, 0)
+
+def initializeXavierUniformWeight(module):
+    """
+    Initialize weight with Xavier uniform distribution to avoid vanishing gradient problem
+    should be enough with this without batch norm since our network is not very deep
+
+    :param module:
+    :return:
+    """
+    classname = module.__class__.__name__
+    if(classname.find('Conv') != -1):
+        xavier_uniform(module.weight, gain=1/math.sqrt(3.0))
+        constant(module.bias, 0)
+    elif(classname.find('Linear') != -1):
+        xavier_uniform(module.weight, gain=1/math.sqrt(3.0))
+        constant(module.bias, 0)
+
 
 ## TODO: wrapper for logging time
 def epoch_timer(func, *args, **kwargs):

@@ -14,7 +14,7 @@ from torchvision import datasets, transforms
 from torch.autograd import Variable
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..",".."))
-from util.helper import initializeWeight
+from util.helper import initializeXavierNormalWeight
 from definitions import DATA_DIR
 
 
@@ -143,7 +143,7 @@ def Criterion(reconstruct_x, x, mu, logvar):
     return cost + kl_div
 
 net = convVaeNet()
-net.apply(initializeWeight)
+net.apply(initializeXavierNormalWeight)
 criterion = Criterion
 if torch.cuda.is_available():
     net = net.cuda()
