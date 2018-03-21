@@ -135,10 +135,9 @@ corruption_level = 0.4
 
 
 def Criterion(reconstruct_x, x, mu, logvar):
-    cost = F.binary_cross_entropy(reconstruct_x, x)
+    cost = F.binary_cross_entropy(reconstruct_x, x, size_average=False)
 
     kl_div = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    kl_div /= batch_size * 784
 
     return cost + kl_div
 
@@ -167,11 +166,11 @@ def train(epoch, decode_tech="transpose"):
         loss.backward()
         optimizer.step()
 
-        cost += loss.data[0]*len(x)
+        cost += loss.data[0]
         if batch_idx%100 == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch + 1, batch_idx * len(x), train_size,
-                100. * (batch_idx*len(x)) / train_size, loss.data[0]))
+                100. * (batch_idx*len(x)) / train_size, loss.data[0]/len(x)))
     return cost/train_size
 
 # TODO: print epoch and use logger

@@ -24,21 +24,17 @@ def laplacian(W, normalized=True):
     assert type(L) is scipy.sparse.csr.csr_matrix
     return L
 
-    
-    
 def rescale_L(L, lmax=2):
     """Rescale Laplacian eigenvalues to [-1,1]"""
     M, M = L.shape
     I = scipy.sparse.identity(M, format='csr', dtype=L.dtype)
     L /= lmax * 2
     L -= I
-    return L 
-
+    return L
 
 def lmax_L(L):
     """Compute largest Laplacian eigenvalue"""
     return scipy.sparse.linalg.eigsh(L, k=1, which='LM', return_eigenvectors=False)[0]
-
 
 # graph coarsening with Heavy Edge Matching
 def coarsen(A, levels):
@@ -316,3 +312,21 @@ def perm_data(x, indices):
             xnew[:,i] = np.zeros(N)
     return xnew
 
+def unperm_indices(perm):
+    temp = [(i, j) for i, j in enumerate(perm)]
+    temp.sort(key=lambda x: x[1])
+    unperm = [i for i, j in temp]
+    return unperm
+
+def unperm_data(x, unperm, original_size):
+    N, M = x.shape
+    Mnew = original_size
+
+    assert Mnew <= M
+    xnew = np.empty((N, Mnew))
+    for i,j in enumerate(unperm):
+        if i >= Mnew:
+            break
+        if j < M:
+            xnew[:,i] = x[:,j]
+    return xnew

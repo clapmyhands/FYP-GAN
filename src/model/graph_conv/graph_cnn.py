@@ -239,17 +239,14 @@ class graph_cnnNet(nn.Module):
             return x
 
     def forward(self, x, d, L, lmax):
-
         # graph CL1
         x = x.unsqueeze(2)  # B x V x Fin=1
         x = self.graph_conv_cheby(x, self.cl1, L[0], lmax[0], self.CL1_F, self.CL1_K)
-        x = F.relu(x)
-        x = self.graph_max_pool(x, 4)
+        x = self.graph_max_pool(F.relu(x), 4)  # B x V/4 x CL1_F
 
         # graph CL2
         x = self.graph_conv_cheby(x, self.cl2, L[2], lmax[2], self.CL2_F, self.CL2_K)
-        x = F.relu(x)
-        x = self.graph_max_pool(x, 4)
+        x = self.graph_max_pool(F.relu(x), 4)  # B x V/16 x CL2_F
 
         # FC1
         x = x.view(-1, self.FC1Fin)
@@ -301,9 +298,7 @@ net.apply(initializeXavierUniformWeight)
 
 # Optimizer
 global_lr = learning_rate
-global_step = 0
 decay = 0.95
-decay_steps = train_size
 lr = learning_rate
 print(net)
 if torch.cuda.is_available():
